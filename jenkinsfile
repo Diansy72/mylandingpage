@@ -20,11 +20,11 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                bat 'npm test || echo "No tests found, skipping..."'
+                bat 'npm test --passWithNoTests || echo "No tests found, skipping..."'
             }
             post {
                 success {
-                    junit 'test-results.xml' // Sesuaikan dengan lokasi hasil tes
+                    junit 'test-results.xml' // Sesuaikan jika ada hasil tes
                 }
                 failure {
                     echo 'Tests failed!'
