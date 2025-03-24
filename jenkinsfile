@@ -35,8 +35,6 @@ pipeline {
         stage('Build') {
             steps {
                 bat 'npm run build' // Perintah build React
-                bat 'if exist ${BUILD_DIR} rmdir /s /q ${BUILD_DIR}' // Menghapus folder docs lama jika ada
-                bat 'move build ${BUILD_DIR}' // Memindahkan hasil build ke folder docs
             }
         }
         stage('Deploy') {
