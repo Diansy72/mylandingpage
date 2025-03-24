@@ -1,31 +1,33 @@
 pipeline {
-    agent {
-        any
-    }
-    options {
-        customWorkspace 'E:\\jenkins-workspace\\my-landing-page'
-    }
+    agent any
     tools {
         nodejs 'NodeJS 17' // Sesuaikan dengan Node.js yang digunakan
     }
     environment {
-        BUILD_DIR = 'build' // Direktori output build React
-        DEPLOY_DIR = 'E:\\deploy\\my-landing-page' // Direktori tujuan deploy
+        WORKSPACE_DIR = 'E:\\jenkins-workspace\\my-landing-page' // Ubah sesuai kebutuhan
+        BUILD_DIR = 'build'
+        DEPLOY_DIR = 'E:\\deploy\\my-landing-page'
     }
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/Diansy72/mylandingpage.git'
+                ws("${env.WORKSPACE_DIR}") { // Gunakan workspace custom
+                    git branch: 'master', url: 'https://github.com/Diansy72/mylandingpage.git'
+                }
             }
         }
         stage('Install Dependencies') {
             steps {
-                bat 'npm install' // Menginstal dependencies dari package.json
+                ws("${env.WORKSPACE_DIR}") {
+                    bat 'npm install' // Menginstal dependencies dari package.json
+                }
             }
         }
         stage('Run Tests') {
             steps {
-                bat 'npm test -- --ci --passWithNoTests'
+                ws("${env.WORKSPACE_DIR}") {
+                    bat 'npm test -- --ci --passWithNoTests'
+                }
             }
             post {
                 success {
@@ -39,14 +41,16 @@ pipeline {
         }
         stage('Build') {
             steps {
-                bat 'npm run build' // Perintah build React
+                ws("${env.WORKSPACE_DIR}") {
+                    bat 'npm run build'
+                }
             }
         }
         stage('Deploy') {
             steps {
                 echo 'Deploying to production environment...'
                 bat 'if not exist "%DEPLOY_DIR%" mkdir "%DEPLOY_DIR%"'
-                bat 'xcopy /E /I /Y "%BUILD_DIR%" "%DEPLOY_DIR%"' // Deploy ke lokasi yang baru
+                bat 'xcopy /E /I /Y "%WORKSPACE_DIR%\\%BUILD_DIR%" "%DEPLOY_DIR%"'
             }
         }
     }
