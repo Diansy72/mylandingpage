@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        nodejs 'NodeJS 16' // Sesuaikan dengan konfigurasi Node.js di Jenkins
+        nodejs 'NodeJS 17' // Sesuaikan dengan konfigurasi Node.js di Jenkins
     }
     environment {
         BUILD_DIR = 'docs' // Direktori output build React
@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/username/mylandingpage.git'
+                git branch: 'master', url: 'https://github.com/Diansy72/mylandingpage.git'
             }
         }
         stage('Install Dependencies') {
