@@ -19,11 +19,11 @@ pipeline {
         }
 
         stage('Run Tests') {
+            when {
+                expression { return env.RUN_TESTS == 'true' }
+            }
             steps {
-                bat '''
-                npm test --passWithNoTests
-                if %ERRORLEVEL% NEQ 0 echo "No tests found, skipping..." & exit 0
-                '''
+                bat 'npm test --passWithNoTests'
             }
         }
 
