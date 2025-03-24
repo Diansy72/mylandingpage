@@ -1,10 +1,11 @@
 pipeline {
     agent any
     tools {
-        nodejs 'NodeJS 17' // Sesuaikan dengan Node.js yang digunakan
+        nodejs 'NodeJS 17' // Sesuaikan dengan versi Node.js yang digunakan
     }
     environment {
-        BUILD_DIR = 'build' // Direktori output build React
+        BUILD_DIR = 'docs' // Direktori output build sesuai struktur repositori
+        DEPLOY_DIR = 'C:\path\to\deployment\server' // Sesuaikan dengan lokasi deployment
     }
     stages {
         stage('Checkout') {
@@ -19,7 +20,7 @@ pipeline {
         }
         stage('Run Tests') {
             steps {
-                bat 'npm test -- --ci --passWithNoTests' // Pastikan Jest berjalan dalam mode CI
+                bat 'npm test -- --ci --passWithNoTests' // Menjalankan Jest dengan mode CI
             }
             post {
                 success {
@@ -34,13 +35,15 @@ pipeline {
         stage('Build') {
             steps {
                 bat 'npm run build' // Perintah build React
+                bat 'if exist ${BUILD_DIR} rmdir /s /q ${BUILD_DIR}' // Menghapus folder docs lama jika ada
+                bat 'move build ${BUILD_DIR}' // Memindahkan hasil build ke folder docs
             }
         }
         stage('Deploy') {
             steps {
                 echo 'Deploying to production environment...'
-                bat 'if not exist C:\\path\\to\\deployment\\server mkdir C:\\path\\to\\deployment\\server'
-                bat 'xcopy /E /I /Y build C:\\path\\to\\deployment\\server' // Deploy ke server lokal
+                bat 'if not exist ${DEPLOY_DIR} mkdir ${DEPLOY_DIR}'
+                bat 'xcopy /E /I /Y ${BUILD_DIR} ${DEPLOY_DIR}' // Deploy ke server lokal
             }
         }
     }
