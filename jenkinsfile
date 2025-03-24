@@ -1,47 +1,44 @@
 pipeline {
     agent any
-
     tools {
         nodejs 'NodeJS 17' // Sesuaikan dengan konfigurasi Node.js di Jenkins
     }
-
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'master', url: 'https://github.com/Diansy72/mylandingpage.git'
             }
         }
-
         stage('Install Dependencies') {
             steps {
                 bat 'npm install'
             }
         }
-
         stage('Run Tests') {
-            when {
-                expression { return env.RUN_TESTS == 'true' }
-            }
             steps {
-                bat 'npm test --passWithNoTests'
+                bat 'npm test'
+            }
+            post {
+                success {
+                    junit 'test-results.xml' // Sesuaikan dengan lokasi file hasil tes
+                }
+                failure {
+                    echo 'Tests failed!'
+                }
             }
         }
-
         stage('Build') {
             steps {
-                bat 'npm run build' // Sesuaikan dengan perintah build di proyek
+                bat 'npm run build'
             }
         }
-
         stage('Deploy') {
             steps {
                 echo 'Deploying to production environment...'
-                // Tambahkan perintah deploy sesuai kebutuhan Anda
-                // Contoh: bat 'xcopy /E /I /Y build C:\\path\\to\\deploy\\folder'
+                bat 'xcopy /E /I /Y build docs' // Menyalin hasil build ke folder docs
             }
         }
     }
-
     post {
         success {
             echo 'Pipeline completed successfully!'
