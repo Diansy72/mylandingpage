@@ -5,7 +5,7 @@ pipeline {
     }
     environment {
         BUILD_DIR = 'docs' // Direktori output build sesuai struktur repositori
-        DEPLOY_DIR = 'C:\path\to\deployment\server' // Sesuaikan dengan lokasi deployment
+        DEPLOY_DIR = 'C:\\path\\to\\deployment\\server' // Menggunakan double backslash
     }
     stages {
         stage('Checkout') {
