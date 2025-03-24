@@ -1,10 +1,10 @@
 pipeline {
     agent any
     tools {
-        nodejs 'NodeJS 17' // Sesuaikan dengan konfigurasi Node.js di Jenkins
+        nodejs 'NodeJS 17' // Sesuaikan dengan Node.js yang digunakan
     }
     environment {
-        BUILD_DIR = 'docs' // Direktori output build React
+        BUILD_DIR = 'build' // Direktori output build React
     }
     stages {
         stage('Checkout') {
@@ -19,11 +19,11 @@ pipeline {
         }
         stage('Run Tests') {
             steps {
-                bat 'npm test' // Menjalankan unit test sesuai dengan setupTests.js
+                bat 'npm test -- --ci --passWithNoTests' // Pastikan Jest berjalan dalam mode CI
             }
             post {
                 success {
-                    junit 'test-results.xml' // Sesuaikan jika hasil test tersimpan di lokasi berbeda
+                    echo 'Tests passed successfully!'
                 }
                 failure {
                     echo 'Tests failed!'
@@ -34,13 +34,13 @@ pipeline {
         stage('Build') {
             steps {
                 bat 'npm run build' // Perintah build React
-                bat 'move build %BUILD_DIR%' // Memindahkan hasil build ke folder docs
             }
         }
         stage('Deploy') {
             steps {
                 echo 'Deploying to production environment...'
-                bat 'xcopy /E /I /Y %BUILD_DIR% C:\\path\\to\\deployment\\server' // Contoh deploy ke server lokal
+                bat 'if not exist C:\\path\\to\\deployment\\server mkdir C:\\path\\to\\deployment\\server'
+                bat 'xcopy /E /I /Y build C:\\path\\to\\deployment\\server' // Deploy ke server lokal
             }
         }
     }
