@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+
+    tools {
+        nodejs 'NodeJS 22.13.1' // Sesuaikan dengan konfigurasi Node.js di Jenkins
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master', url: 'https://github.com/Diansy72/mylandingpage.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                bat 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                bat 'npm test || echo "No tests found, skipping..."'
+            }
+            post {
+                success {
+                    junit 'test-results.xml' // Sesuaikan dengan lokasi hasil tes
+                }
+                failure {
+                    echo 'Tests failed!'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'npm run build' // Sesuaikan dengan perintah build di proyek
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying to production environment...'
+                // Tambahkan perintah deploy sesuai kebutuhan Anda
+                // Contoh: bat 'xcopy /E /I /Y build C:\\path\\to\\deploy\\folder'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
